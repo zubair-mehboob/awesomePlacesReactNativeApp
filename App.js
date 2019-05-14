@@ -14,11 +14,14 @@ import {
 //import ListItems from "./screens/src/components/List/ListItem";
 import UserInput from "./screens/src/components/UserInput/UserInput";
 import ListOutput from "./screens/src/components/List/ListOutput";
+import image from "./screens/src/assets/Images/1.jpg";
+import PlaceDetails from "./screens/src/components/PlaceDetails/PlaceDetails";
 
 export default class App extends React.Component {
   state = {
     inputText: "",
-    placesArray: []
+    placesArray: [],
+    selectedPlace: null
   };
   handleTextChange = value => {
     this.setState({
@@ -30,31 +33,57 @@ export default class App extends React.Component {
     this.setState({
       placesArray: this.state.placesArray.concat({
         name: this.state.inputText,
-        key: Math.random().toString()
+        key: Math.random().toString(),
+        image
       })
     });
   };
 
-  handleListTouch = id => {
-    // alert(`Id: ${id} is touched`);
-    const filtered = this.state.placesArray.filter(place => place.key !== id);
+  handleListItemDeleted = id => {
+    //alert(`Id: ${id} is touched`);
+    const filtered = this.state.placesArray.filter(
+      place => place.key !== this.state.selectedPlace.key
+    );
+
     this.setState(p => {
       return {
-        placesArray: filtered
+        placesArray: filtered,
+        selectedPlace: null
       };
     });
   };
 
+  handleListItemSelected = id => {
+    //alert(`Id: ${id} is touched`);
+    const found = this.state.placesArray.find(place => place.key === id);
+    this.setState(p => {
+      return {
+        selectedPlace: found
+      };
+    });
+  };
+
+  modalClosedHandler = () => {
+    //alert("hey");
+    this.setState({
+      selectedPlace: null
+    });
+  };
   render() {
     return (
       <View style={styles.container}>
+        <PlaceDetails
+          selectedPlace={this.state.selectedPlace}
+          modalClosedHandler={this.modalClosedHandler}
+          handleListItemDeleted={this.handleListItemDeleted}
+        />
         <UserInput
           handleTextChange={this.handleTextChange}
           handleClick={this.handleClick}
         />
         <ListOutput
           placesArray={this.state.placesArray}
-          handleListTouch={this.handleListTouch}
+          handleListItemSelected={this.handleListItemSelected}
         />
       </View>
     );
